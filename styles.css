@@ -332,6 +332,12 @@ h3 {
   font-size: 14px !important;
 }
 
+.small-note a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .footer {
   width: min(var(--max), calc(100% - 32px));
   margin: 0 auto;
