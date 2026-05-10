@@ -295,10 +295,6 @@ h3 {
 .book li { color: #aaa; font-size: 15px; }
 
 /* ── Final CTA ── */
-.final p {
-  font-size: 21px;
-}
-
 .final {
   text-align: center;
   max-width: 850px;
@@ -307,17 +303,6 @@ h3 {
 
 .final p {
   font-size: 21px;
-}
-
-.small-note {
-  margin-top: 18px;
-  font-size: 14px !important;
-}
-
-.small-note a {
-  color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 .footer {
@@ -329,6 +314,12 @@ h3 {
   justify-content: space-between;
   font-size: 14px;
   color: #888;
+}
+
+.footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ── Responsive ── */
