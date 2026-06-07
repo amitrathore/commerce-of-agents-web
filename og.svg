@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="Inter, system-ui, -apple-system, sans-serif">
+  <rect width="1200" height="630" fill="#f7f4ee"/>
+  <g transform="translate(80, 90)">
+    <circle cx="22" cy="22" r="22" fill="#b36b2c"/>
+    <text x="60" y="32" font-size="22" font-weight="600" fill="#151515">Commerce of Agents</text>
+  </g>
+  <text x="80" y="290" font-size="72" font-weight="700" fill="#151515" letter-spacing="-1.5">Commerce is moving</text>
+  <text x="80" y="370" font-size="72" font-weight="700" fill="#151515" letter-spacing="-1.5">from storefronts to agents.</text>
+  <text x="80" y="470" font-size="26" font-weight="500" fill="#555">A new economic model for AI-native markets.</text>
+  <g transform="translate(80, 540)">
+    <rect width="60" height="4" fill="#b36b2c"/>
+    <text x="0" y="40" font-size="18" font-weight="600" fill="#b36b2c" letter-spacing="2">COMMERCEOFAGENTS.COM</text>
+  </g>
+</svg>

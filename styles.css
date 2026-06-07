@@ -322,6 +322,57 @@ h3 {
   text-underline-offset: 3px;
 }
 
+/* ── Byline ── */
+.byline {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #666;
+}
+.byline a { color: var(--accent); }
+
+/* ── Why-now list ── */
+.why-now-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px 40px;
+}
+.why-now-list > div {
+  padding-left: 18px;
+  border-left: 2px solid var(--soft);
+}
+.why-now-list h3 { margin-bottom: 6px; }
+.why-now-list p  { font-size: 15px; color: #555; line-height: 1.5; }
+
+/* ── Protocol callout ── */
+.protocol-callout {
+  background: var(--card-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin-bottom: 40px;
+  font-size: 15px;
+  color: #333;
+  line-height: 1.55;
+}
+.protocol-callout strong { color: var(--text); }
+
+/* ── Waitlist ── */
+.waitlist {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid #333;
+}
+.waitlist-pitch {
+  color: var(--bg) !important;
+  font-size: 16px !important;
+  margin-bottom: 14px;
+}
+.waitlist iframe {
+  background: transparent;
+  display: block;
+  width: 100%;
+}
+
 /* ── Responsive ── */
 @media (max-width: 880px) {
   .hero {
@@ -341,6 +392,10 @@ h3 {
 
   .feature-list {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .why-now-list {
+    grid-template-columns: 1fr;
   }
 
   .footer {
