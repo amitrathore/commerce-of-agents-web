@@ -1,14 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="Inter, system-ui, -apple-system, sans-serif">
-  <rect width="1200" height="630" fill="#f7f4ee"/>
-  <g transform="translate(80, 90)">
-    <circle cx="22" cy="22" r="22" fill="#b36b2c"/>
-    <text x="60" y="32" font-size="22" font-weight="600" fill="#151515">Commerce of Agents</text>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 630" width="1200" height="630" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="text-shield" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#151515" stop-opacity="1"/>
+      <stop offset="0.50" stop-color="#151515" stop-opacity="0.96"/>
+      <stop offset="0.67" stop-color="#151515" stop-opacity="0.42"/>
+      <stop offset="0.82" stop-color="#151515" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="#151515"/>
+  <image x="0" y="0" width="1200" height="630" preserveAspectRatio="xMidYMid slice" xlink:href="og-art.png" href="og-art.png"/>
+  <rect width="1200" height="630" fill="url(#text-shield)"/>
+
+  <g transform="translate(72 64)">
+    <circle cx="9" cy="9" r="9" fill="#b36b2c"/>
+    <text x="31" y="16" fill="#f7f4ee" font-size="19" font-weight="600" letter-spacing="0.2">Commerce of Agents</text>
   </g>
-  <text x="80" y="290" font-size="72" font-weight="700" fill="#151515" letter-spacing="-1.5">Commerce is moving</text>
-  <text x="80" y="370" font-size="72" font-weight="700" fill="#151515" letter-spacing="-1.5">from storefronts to agents.</text>
-  <text x="80" y="470" font-size="26" font-weight="500" fill="#555">A new economic model for AI-native markets.</text>
-  <g transform="translate(80, 540)">
-    <rect width="60" height="4" fill="#b36b2c"/>
-    <text x="0" y="40" font-size="18" font-weight="600" fill="#b36b2c" letter-spacing="2">COMMERCEOFAGENTS.COM</text>
+
+  <g transform="translate(72 203)">
+    <text fill="#f7f4ee" font-size="56" font-weight="700" letter-spacing="-1.7">
+      <tspan x="0" y="0">Commerce is moving</tspan>
+      <tspan x="0" y="65">from storefronts</tspan>
+      <tspan x="0" y="130">to agents.</tspan>
+    </text>
+  </g>
+
+  <g transform="translate(72 480)">
+    <rect width="54" height="3" rx="1.5" fill="#b36b2c"/>
+    <text x="0" y="45" fill="#c9c5bd" font-size="20" font-weight="500">The economic model for AI-native markets.</text>
+    <text x="0" y="87" fill="#b36b2c" font-size="13" font-weight="700" letter-spacing="2.2">COMMERCEOFAGENTS.COM</text>
   </g>
 </svg>
