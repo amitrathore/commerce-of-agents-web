@@ -15,7 +15,7 @@ Companion note: https://www.commerceofagents.com/market-protocol-2.html
 
 This document describes the **seller-hosted HTTP adapter** used by a Market game such as Agents of Mind. It is distinct from the Game Master's `market/*` event API. The seller remains authoritative for its catalog, customer entitlements, and fulfillment; Market owns accepted orders, payment routing, attribution, and its ledger. “Market Protocol 2.0” is the name for the recent end-to-end work. The wire protocol here has the concrete `Seller-Commerce-Version: 2` and `contract_version: 2` identifiers.
 
-Yvatar is a production seller example: its v2 manifest advertises `one-time` billing for creation-credit purchases, and its service fulfills those purchases. The contract also supports an independent software vendor (ISV) selling one-time software products and recurring subscriptions. The sample catalog and identifiers below illustrate both billing paths; they are not Yvatar's actual catalog or a claim that Yvatar offers subscriptions.
+Yvatar is a production seller example: its v2 manifest advertises `one-time` billing for creation-credit purchases, and its service fulfills those purchases. LIAM is an example of an independent software vendor (ISV) offering one-time software products and recurring subscriptions; its Market integration is not yet active in production. The sample catalog and identifiers below illustrate both billing paths. They are not the actual catalog of either seller.
 
 ## 1. Roles and trust boundary
 
