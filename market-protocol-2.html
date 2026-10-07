@@ -58,7 +58,7 @@
         <section id="seller-integration">
           <h2>The seller remains a real participant</h2>
           <p>Market does not have to become the seller’s catalog, billing system, or fulfillment database. A seller agent can publish capabilities from Shopify, WooCommerce, a native service, or another provider. The Seller Commerce API v2 gives the game a private, versioned bridge to the seller system: a compatibility manifest, catalog, checkout preparation, typed lifecycle events, and a durable fulfillment outbox.</p>
-          <p>For a recurring seller such as LIAM, a stable Market subscription identity can survive a replacement processor subscription. Renewals, plan changes, failed payments, refunds, and chargebacks arrive as distinct lifecycle events. The seller applies its own entitlement rules and emits fulfillment events; its agent marks the corresponding Market order fulfilled and acknowledges the event only after that update succeeds.</p>
+          <p>An independent software vendor can offer both products bought once and recurring subscriptions. LIAM is one example of this kind of seller: its one-time purchases and subscriptions can use the same seller bridge while retaining their different billing and entitlement rules. For a subscription, a stable Market identity can survive a replacement processor subscription. Renewals, plan changes, failed payments, refunds, and chargebacks arrive as distinct lifecycle events. The seller applies its own entitlement rules and emits fulfillment events; its agent marks the corresponding Market order fulfilled and acknowledges the event only after that update succeeds.</p>
           <p>The public Market profile describes what an adapter supports. Its service URL, bearer credential, processor IDs, and private commission agreement stay in operator configuration. A seller enables checkout for each SKU only when its payment and fulfillment paths are ready.</p>
         </section>
 
@@ -72,7 +72,7 @@
         <section id="trust-and-rollout">
           <h2>Trust is a deployment property</h2>
           <p>Market’s state machine is reusable, but a production seller still needs an authorized identity, a configured merchant route, a compatible adapter, real fulfillment, and signed payment tests. Games set their own persisted return windows and payout holds through audited events. A UI seed does not override that live policy.</p>
-          <p>Market Protocol 2.0 is being used in production: Agents of Mind has opened its Market with Yvatar as a live seller. Each additional seller, including LIAM, joins through the same versioned contract and production checks. Protocol readiness and a specific seller's activation are separate operational facts.</p>
+          <p>Market Protocol 2.0 is being used in production: Agents of Mind has opened its Market with Yvatar as a live seller. Additional independent vendors join through the same versioned contract and production checks. Protocol readiness and a specific seller's activation are separate operational facts.</p>
         </section>
 
         <section id="why-it-matters">
@@ -80,7 +80,7 @@
           <p>A market for agents needs more than a search index and a payment button. It needs a durable agreement that both sides can act on, a way to meet existing commerce systems where they are, and a reliable account of every transition from intent to after-sale resolution. Market Protocol 2.0 is that practical step: agents can coordinate an economic decision while people and operators can still inspect the terms, money movement, and outcome.</p>
           <div class="article-end">
             <h3>Building a seller agent?</h3>
-            <p>The <a href="seller-agent-v2.txt">Seller Commerce API v2 integration guide</a> is a raw Markdown document with endpoint contracts, JSON examples, idempotency rules, and a LIAM-style acceptance checklist. It describes the seller-facing adapter, which is distinct from the Game Master’s Market event API.</p>
+            <p>The <a href="seller-agent-v2.txt">Seller Commerce API v2 integration guide</a> is a raw Markdown document with endpoint contracts, JSON examples for one-time products and subscriptions, idempotency rules, and a seller acceptance checklist. It describes the seller-facing adapter, which is distinct from the Game Master’s Market event API.</p>
           </div>
         </section>
       </div>
