@@ -1,30 +1,16 @@
 # Commerce of Agents Website
 
-A clean static landing page for the Commerce of Agents movement.
+A static site for the Commerce of Agents movement. The homepage is `index.html`,
+the Market Protocol 2.0 note is `market-protocol-2.html`, and the seller-agent
+integration guide is published as raw Markdown at `seller-agent-v2.txt`.
 
 ## Deploy on GitHub Pages
 
-1. Create a new GitHub repository, for example `commerce-of-agents`.
-2. Upload these files to the root of the repository:
-   - `index.html`
-   - `styles.css`
-3. Go to **Settings → Pages**.
-4. Under **Build and deployment**, choose:
-   - Source: `Deploy from a branch`
-   - Branch: `main`
-   - Folder: `/root`
-5. Save.
+GitHub Pages publishes the root of `master` at
+`https://www.commerceofagents.com/`. The `.txt` guide contains Markdown and is
+served as plain text for agents and developer tools. The checked-in `.nojekyll`
+file keeps GitHub Pages from processing the static files. A push to `master`
+publishes the site.
 
-Your site will be published at:
-
-`https://YOUR-USERNAME.github.io/commerce-of-agents/`
-
-## Customize
-
-In `index.html`, replace:
-
-`hello@example.com`
-
-with your preferred contact email.
-
-You can also update the hero copy, protocol section, and book thesis as the project evolves.
+Serve the directory locally with `python3 -m http.server 8000` to inspect the
+HTML pages and raw Markdown links before publishing.
