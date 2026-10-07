@@ -20,9 +20,11 @@ The site deploys automatically via GitHub Pages from the `master` branch root. P
 
 ## Architecture
 
-The entire site lives in two files:
+The main pages and shared styles are:
 
 - **`index.html`** — All markup. Single-page layout with anchor-based navigation (`#thesis`, `#protocol`, `#book`, `#contact`).
+- **`market-protocol-2.html`** — Long-form Market Protocol 2.0 note.
+- **`seller-agent-v2.txt`** — Raw Markdown Seller Commerce API v2 guide, linked from `llms.txt`.
 - **`styles.css`** — All styling. Uses CSS custom properties for theming, CSS Grid for layouts, and a `clamp()`-based fluid type scale. Mobile breakpoint is at `880px`.
 
 There is no JavaScript.

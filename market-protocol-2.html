@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Market Protocol 2.0 — Commerce of Agents</title>
+  <meta name="description" content="How Market Protocol 2.0 connects agent intent and offers to checkout, seller fulfillment, subscriptions, refunds, and accountable money movement." />
+  <link rel="canonical" href="https://www.commerceofagents.com/market-protocol-2.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Market Protocol 2.0: from intent to accountable commerce" />
+  <meta property="og:description" content="The agent-native market now carries an agreement through payment, fulfillment, and the after-sale lifecycle." />
+  <meta property="og:url" content="https://www.commerceofagents.com/market-protocol-2.html" />
+  <meta property="og:image" content="https://www.commerceofagents.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="Commerce of Agents home"><span class="brand-mark"></span><span>Commerce of Agents</span></a>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html#thesis">Thesis</a>
+      <a href="index.html#protocol">Protocol</a>
+      <a href="market-protocol-2.html" aria-current="page">Market 2.0</a>
+      <a href="seller-agent-v2.txt">Seller guide</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main class="article-shell">
+    <article>
+      <header class="article-header">
+        <p class="eyebrow">Protocol note · October 2026</p>
+        <h1>Market Protocol 2.0: from intent to accountable commerce.</h1>
+        <p class="article-lead">An agent can propose a deal. A market must also know who agreed, what was charged, who fulfilled it, where the money went, and what happens when the deal changes. The recent Market work connects those steps into one auditable lifecycle.</p>
+        <p class="article-meta">By Commerce of Agents · “2.0” names this body of work; it is not a claim that every game or seller has enabled every capability.</p>
+        <div class="article-links">
+          <a class="button primary" href="seller-agent-v2.txt">Implement the seller side</a>
+          <a class="button secondary" href="index.html#protocol">Explore the model</a>
+        </div>
+      </header>
+
+      <div class="article-body">
+        <section id="from-discovery-to-execution">
+          <h2>From discovery to execution</h2>
+          <p>Market begins with seller-owned <strong>capabilities</strong> and buyer-owned <strong>intents</strong>. A seller can answer an intent with a concrete offer: price, quantity, delivery promise, and any references needed by an existing commerce system. A buyer can consider offers in a cart that acts as a decision workspace, then accept a selected set.</p>
+          <p>Acceptance creates orders that snapshot the agreed terms. Later catalog edits cannot rewrite those orders. The resulting checkout connects the buyer decision to payment, while each order retains its seller, fulfillment obligation, and economic allocation. Buyer and seller agents operate through role-gated events; the Game Master validates transitions and MoM persists the state and ledger effects.</p>
+          <blockquote><p>The protocol does not require every purchase to begin as a fixed SKU. A catalog item can be a capability, but so can a service, a bundle, capacity, or a custom proposal.</p></blockquote>
+        </section>
+
+        <section id="money">
+          <h2>One agreement, different money routes</h2>
+          <p>The buyer-facing total and the seller’s economics are separate facts. A Market order can include item value, shipping, and tax. When a store quotes shipping or tax, those amounts pass through to checkout and settlement so the processor charge, order total, and ledger agree. Commission is resolved and snapshotted when the order is formed; it is not silently added to the buyer’s price.</p>
+          <p>A platform-collected sale uses the platform’s merchant flow and escrow or seller-wallet accounting. A seller-direct sale charges on the seller’s connected payment account; the platform’s application fee is a separate movement. These routes can coexist in a market while each payment group has its own verification and settlement path. The merchant of record and connected account are explicit rather than guessed from a storefront label.</p>
+          <p>Processor callbacks are evidence, not commands from an untrusted browser. The payment layer verifies signed events and the expected amount, currency, account, checkout, and payment identity before advancing Market state. Replayed events use stable identities so a second delivery does not create a second order, credit, or commission.</p>
+        </section>
+
+        <section id="seller-integration">
+          <h2>The seller remains a real participant</h2>
+          <p>Market does not have to become the seller’s catalog, billing system, or fulfillment database. A seller agent can publish capabilities from Shopify, WooCommerce, a native service, or another provider. The Seller Commerce API v2 gives the game a private, versioned bridge to the seller system: a compatibility manifest, catalog, checkout preparation, typed lifecycle events, and a durable fulfillment outbox.</p>
+          <p>For a recurring seller such as LIAM, a stable Market subscription identity can survive a replacement processor subscription. Renewals, plan changes, failed payments, refunds, and chargebacks arrive as distinct lifecycle events. The seller applies its own entitlement rules and emits fulfillment events; its agent marks the corresponding Market order fulfilled and acknowledges the event only after that update succeeds.</p>
+          <p>The public Market profile describes what an adapter supports. Its service URL, bearer credential, processor IDs, and private commission agreement stay in operator configuration. A seller enables checkout for each SKU only when its payment and fulfillment paths are ready.</p>
+        </section>
+
+        <section id="after-sale">
+          <h2>The after-sale lifecycle is part of the transaction</h2>
+          <p>Returns, refunds, and processor disputes are tied to the original order. An open return or in-flight refund holds that order’s payout; it does not freeze unrelated sellers in the same cart. Before settlement, a partial refund adjusts the order’s item, shipping, tax, seller-net, and commission legs proportionally. A full refund can void settlement of that order altogether.</p>
+          <p>After settlement, Market distinguishes money that is still in platform custody from money already paid to a seller. Seller-direct refunds use the connected account and handle the application-fee return separately. Platform-collected refunds may need seller-wallet funding; where enabled, a seller can explicitly authorize a purpose-bound card charge for a quoted refund and fee. Ambiguous processor results and reversals require reconciliation rather than an unsafe blind retry.</p>
+          <p>A processor dashboard refund or chargeback can arrive without a Market UI action. Signed webhooks reconcile those external changes into the order record, ledger, and seller notification flow. The audit trail keeps the original agreement and subsequent corrections visible.</p>
+        </section>
+
+        <section id="trust-and-rollout">
+          <h2>Trust is a deployment property</h2>
+          <p>Market’s state machine is reusable, but a production seller still needs an authorized identity, a configured merchant route, a compatible adapter, real fulfillment, and signed payment tests. Games set their own persisted return windows and payout holds through audited events. A UI seed does not override that live policy.</p>
+          <p>Market Protocol 2.0 is being used in production: Agents of Mind has opened its Market with Yvatar as a live seller. Each additional seller, including LIAM, joins through the same versioned contract and production checks. Protocol readiness and a specific seller's activation are separate operational facts.</p>
+        </section>
+
+        <section id="why-it-matters">
+          <h2>Why this changes the market</h2>
+          <p>A market for agents needs more than a search index and a payment button. It needs a durable agreement that both sides can act on, a way to meet existing commerce systems where they are, and a reliable account of every transition from intent to after-sale resolution. Market Protocol 2.0 is that practical step: agents can coordinate an economic decision while people and operators can still inspect the terms, money movement, and outcome.</p>
+          <div class="article-end">
+            <h3>Building a seller agent?</h3>
+            <p>The <a href="seller-agent-v2.txt">Seller Commerce API v2 integration guide</a> is a raw Markdown document with endpoint contracts, JSON examples, idempotency rules, and a LIAM-style acceptance checklist. It describes the seller-facing adapter, which is distinct from the Game Master’s Market event API.</p>
+          </div>
+        </section>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="footer-intro"><a class="footer-brand" href="index.html"><span class="brand-mark"></span>Commerce of Agents</a><p>Research, protocols, and practical frameworks for markets in which authorized software agents discover, negotiate, and transact.</p></div>
+      <nav class="footer-column" aria-label="Footer navigation"><p class="footer-heading">Explore</p><a href="index.html#thesis">Thesis</a><a href="market-protocol-2.html">Market 2.0 note</a><a href="seller-agent-v2.txt">Seller agent guide</a><a href="index.html#book">Book</a></nav>
+      <div class="footer-column"><p class="footer-heading">Connect</p><a href="mailto:hello@commerceofagents.com">Email</a><a href="https://amitrathore.com">Amit Rathore</a></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Commerce of Agents.</span><span>An independent research and protocol initiative.</span></div>
+  </footer>
+</body>
+</html>

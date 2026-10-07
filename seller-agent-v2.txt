@@ -1,0 +1,228 @@
+---
+title: Seller Commerce API v2 — seller agent integration guide
+id: coa.market.seller-commerce.v2
+contract_version: 2
+audience: seller-agent and seller-service implementers
+format: Markdown with JSON examples
+updated: 2026-10-06
+status: production integration guide; enable each seller after its own acceptance checks
+---
+
+# Seller Commerce API v2: implement the seller side of Market
+
+Canonical URL: https://www.commerceofagents.com/seller-agent-v2.txt
+Companion note: https://www.commerceofagents.com/market-protocol-2.html
+
+This document describes the **seller-hosted HTTP adapter** used by a Market game such as Agents of Mind. It is distinct from the Game Master's `market/*` event API. The seller remains authoritative for its catalog, customer entitlements, and fulfillment; Market owns accepted orders, payment routing, attribution, and its ledger. “Market Protocol 2.0” is the name for the recent end-to-end work. The wire protocol here has the concrete `Seller-Commerce-Version: 2` and `contract_version: 2` identifiers.
+
+## 1. Roles and trust boundary
+
+1. An operator provisions a seller player/seat, private adapter base URL and service token, supported payment route, connected account if needed, and a private commission agreement. Do not publish service tokens or processor secrets in Market catalog state.
+2. A seller agent reads the provider's catalog and declares/updates seller-owned Market capabilities. It queries its own Market orders and reports fulfillment with `market/mark-fulfilled`.
+3. The game calls the seller's private v2 endpoints to verify compatibility, read the catalog, prepare a checkout, and deliver payment/subscription/refund/dispute lifecycle facts. The provider validates those facts against its own processor/account where applicable.
+4. The seller service grants or reverses entitlements in a durable transaction, and writes fulfillment events to a durable outbox. The seller agent acknowledges an outbox event only **after** the Market order update succeeds.
+
+All v2 calls use HTTPS, `Authorization: Bearer <seller-service-token>`, and `Seller-Commerce-Version: 2`. POST bodies and success responses use `Content-Type: application/json`. Use a credential dedicated to the game/provider relationship. Reject missing or invalid credentials; never infer authorization from a catalog item or a browser session.
+
+Amounts are integer minor units (for USD, cents); currencies are uppercase ISO 4217 codes. Keep Market IDs distinct from Stripe or other provider IDs. Examples use fake identifiers and a `.test` address.
+
+## 2. Endpoint map
+
+| Method | Path | Seller service responsibility |
+| --- | --- | --- |
+| GET | `/seller-commerce/v2/manifest` | Declare adapter identity and supported features. |
+| GET | `/seller-commerce/v2/catalog` | Return versioned SKUs, prices, billing and fulfillment metadata. |
+| POST | `/seller-commerce/v2/checkouts/prepare` | Validate the immutable Market quote and bind it to a durable `fulfillment_ref`. |
+| POST | `/seller-commerce/v2/lifecycle-events` | Apply a verified economic event exactly once; return any fulfillment events. |
+| POST | `/seller-commerce/v2/fulfillment-events/query` | Return unacknowledged events for the caller's specified Market order IDs. |
+| POST | `/seller-commerce/v2/fulfillment-events/{event_id}/ack` | Acknowledge an event after Market records fulfillment. |
+
+The current player-agent fulfillment relay can still use Seller Commerce v1 even when the game calls the provider's v2 checkout and lifecycle endpoints. Implement and keep the v1 fulfillment query/ack endpoints until that relay is upgraded and its removal is explicitly approved. Do not silently remove v1 when adding v2.
+
+## 3. Manifest and catalog
+
+`GET /seller-commerce/v2/manifest` must return the configured `adapter_id`, `contract_version: 2`, an environment (`test`, `preview`, or `production`), a checkout UI (`embedded` or `redirect`), nonempty supported `billing_modes` and `recipient_types`, `fulfillment_mode: "provider-outbox"`, and lifecycle types including `payment.confirmed`. Supported billing modes are `one-time`, `recurring`, and `free`; recipient types are `email`, `player`, and `none`. Advertise only features the seller actually implements. The game fails closed on an incompatible manifest.
+
+LIAM-style production manifest example (illustrative IDs; deploy only capabilities the real seller service supports):
+
+```json
+{
+  "adapter_id": "liam",
+  "display_name": "Liam",
+  "contract_version": 2,
+  "environment": "production",
+  "checkout_ui": "embedded",
+  "billing_modes": ["recurring", "free"],
+  "recipient_types": ["email"],
+  "fulfillment_mode": "provider-outbox",
+  "lifecycle_event_types": [
+    "payment.confirmed", "subscription.renewed",
+    "subscription.plan_changed", "subscription.status_changed",
+    "refund.settled", "chargeback.opened", "chargeback.resolved"
+  ]
+}
+```
+
+`GET /seller-commerce/v2/catalog` returns `catalog_version` and `items`. A catalog item has a stable `sku`, title/description, `price`, `billing`, entitlement and fulfillment metadata, and optional images, display order, subscription group, and `price_ref`. `billing` is `"one_time"`, `"free"`, or an interval object such as `{"interval":"month","interval_count":1}`. For a recurring Stripe-backed plan, `price_ref` identifies the seller's immutable Stripe Price. Set `checkout_enabled: false` for a visible preview that must not be purchased.
+
+```json
+{
+  "catalog_version": 3,
+  "currency": "USD",
+  "items": [{
+    "sku": "plus",
+    "title": "Liam Plus",
+    "description": "5,000 creation credits each month",
+    "kind": "subscription",
+    "price": {"amount": 4900, "currency": "USD"},
+    "price_ref": "price_example_plus",
+    "billing": {"interval": "month", "interval_count": 1},
+    "subscription_group": "liam-credits",
+    "checkout_enabled": true,
+    "entitlements": [{"type": "credits", "amount": 5000, "period": "month"}],
+    "fulfillment": {"type": "account-entitlement", "recipient": {"type": "email"}},
+    "images": []
+  }]
+}
+```
+
+The seller agent should sync catalog changes to Market capabilities using its seller identity, preserving SKU and adapter references. A catalog version or price change must not rewrite already accepted Market orders.
+
+## 4. Checkout preparation
+
+The game calls `POST /seller-commerce/v2/checkouts/prepare` before sending the buyer to payment. Treat `checkout_id` as an idempotency key. Validate the adapter's current SKU, catalog version, recipient, quantity, currency, price and quoted total. Reject a mismatch instead of accepting a changed charge. Persist the reservation and return the **same** opaque `fulfillment_ref` on a replay.
+
+The current game request has snake_case top-level fields and a hyphenated `order-id` inside each `orders` entry. Do not normalize this away when parsing the wire body:
+
+```json
+{
+  "checkout_id": "checkout_demo",
+  "checkout_batch_id": "checkout_group_demo",
+  "market_subscription_id": "subscription_checkout_demo",
+  "buyer": "buyer_demo",
+  "recipient": {"type": "email", "value": "buyer@example.test"},
+  "catalog_version": 3,
+  "application_fee_bps": 3000,
+  "orders": [{
+    "order-id": "order_demo",
+    "sku": "plus",
+    "quantity": 1,
+    "money": {"amount": 4900, "currency": "USD"}
+  }]
+}
+```
+
+Success (`200`):
+
+```json
+{"fulfillment_ref":"liam:checkout_demo","recipient":{"type":"email","value":"buyer@example.test"}}
+```
+
+The example LIAM service handles one order per prepared checkout; a general seller service should either support the order array it advertises or reject unsupported combinations explicitly. `application_fee_bps` is the game's private, quoted commission input, not a reason to alter the buyer's catalog price.
+
+## 5. Lifecycle events and idempotency
+
+The game posts to `POST /seller-commerce/v2/lifecycle-events` after payment verification or another authoritative transition. It sends `Idempotency-Key: <event_id>`; require an exact match to the body `event_id`. Persist the event ID, a digest of its payload, the entitlement/fulfillment effect, and the response atomically. Replays of the same ID and payload return the stored response (for example with `status: "replayed"`); the same ID with different content returns `409 idempotency-conflict`. A timeout may mean the first call committed, so the caller must be able to retry safely.
+
+Example payment confirmation (provider IDs are references, not Market identities):
+
+```json
+{
+  "event_id": "evt_test_example",
+  "event_type": "payment.confirmed",
+  "occurred_at": "2026-10-06T12:00:00Z",
+  "market": {
+    "checkout_id": "checkout_demo",
+    "checkout_batch_id": "checkout_group_demo",
+    "order_ids": ["order_demo"],
+    "subscription_id": "subscription_checkout_demo",
+    "buyer": "buyer_demo",
+    "fulfillment_ref": "liam:checkout_demo"
+  },
+  "payment": {
+    "provider": "stripe",
+    "mode": "live",
+    "status": "paid",
+    "money": {"amount": 4900, "currency": "USD"},
+    "application_fee": {"amount": 1470, "currency": "USD"},
+    "provider_references": {
+      "checkout_session": "cs_example",
+      "subscription": "sub_example",
+      "invoice": "in_example",
+      "connected_account": "acct_example"
+    }
+  },
+  "payload": {"plan_sku": "plus"}
+}
+```
+
+Success (`200`) may include fulfillment events:
+
+```json
+{
+  "event_id": "evt_test_example",
+  "status": "processed",
+  "fulfillment_events": [{
+    "id": "event_demo",
+    "order_id": "order_demo",
+    "type": "credits-granted",
+    "occurred_at": "2026-10-06T12:00:01Z",
+    "data": {"sku": "plus", "credits": 5000}
+  }]
+}
+```
+
+Handle only lifecycle types declared in the manifest. The current game may send:
+
+| `event_type` | Required seller effect |
+| --- | --- |
+| `payment.confirmed` | Verify prepared checkout and provider evidence; activate/grant once. A free plan can use provider `none` and zero money. |
+| `subscription.renewed` | Apply the new paid service period once; preserve the stable Market subscription ID. |
+| `subscription.plan_changed` | Apply an immediate paid upgrade or schedule a downgrade for renewal according to seller terms. |
+| `subscription.status_changed` | Adjust access for failed, unpaid, canceled, or recovered subscriptions. |
+| `refund.settled` | Reverse the settled amount/related entitlement once; do not reverse more than the paid purchase. |
+| `chargeback.opened` | Mark the purchase under review without inventing a refund. |
+| `chargeback.resolved` | Apply the `won`/`lost` outcome; a lost dispute reverses the applicable grant once. |
+
+For a refund, use the stable processor refund ID as `event_id` even if multiple webhook deliveries describe the same refund. Preserve the accepted checkout and Market subscription IDs while storing processor subscription, invoice, refund and dispute IDs as replaceable references. If a customer spent credits before a refund, do not make spendable credits negative; track the remaining recovery obligation and apply it to future grants according to seller policy.
+
+## 6. Fulfillment outbox
+
+The seller service writes fulfillment events durably before returning a lifecycle success. Its seller agent obtains **its own** Market order IDs, then calls:
+
+```http
+POST /seller-commerce/v2/fulfillment-events/query
+Authorization: Bearer <seller-service-token>
+Seller-Commerce-Version: 2
+Content-Type: application/json
+
+{"order_ids":["order_demo"]}
+```
+
+Return only unacknowledged events for those order IDs:
+
+```json
+{"events":[{"id":"event_demo","order_id":"order_demo","type":"credits-granted","occurred_at":"2026-10-06T12:00:01Z","data":{"sku":"plus","credits":5000}}]}
+```
+
+The agent rejects any unexpected order ID, submits `market/mark-fulfilled` for a matching order, and only after Market reports success calls `POST /seller-commerce/v2/fulfillment-events/event_demo/ack`. A successful ack returns `{"acknowledged":true}`. Keep the event available after an agent crash or failed Market call; a later query must find it again. The current Yvatar implementation accepts batches of 1–100 known order IDs. If the v1 relay is still deployed, its request key is `order-ids` (hyphenated), and the v1 paths remain required during migration.
+
+## 7. Error and release behavior
+
+Use an HTTP error status plus a machine-readable body such as:
+
+```json
+{"error":{"code":"catalog-mismatch","message":"SKU or quoted price changed","retryable":false}}
+```
+
+Use `401`/`403` for authentication or authorization failure, `409` for quote or idempotency conflict, `422` for invalid or unsupported input, and `5xx` only for a condition that may need safe retry. Do not mark an event processed before its entitlement and outbox writes commit. Do not return a new `fulfillment_ref` on a replay of `checkout_id`.
+
+For LIAM or another seller, verify in Stripe **test mode** each advertised billing path before production activation: initial payment/free activation, renewal, upgrade/downgrade, failed payment, refund, dispute, abandoned checkout, and webhook replay. Confirm matching Market order/subscription state, seller entitlements, fulfillment ack, processor IDs, and ledger/application-fee movement. Repeat deliveries must not duplicate charges, credits, or commission. Then configure the real seller account, signed webhooks, production fulfillment service, and checkout-enabled catalog. These are acceptance checks for a production integration, not a separate preview protocol.
+
+## 8. Implementation references
+
+- Market event and state model: `Intergraph-AI/the-js-game/docs/MARKET_PROTOCOL.md` and `gm-lib/src/game/protocols/market.clj`.
+- AoM's v2 HTTP client and event mapping: `Intergraph-AI/agents-of-mind/src/agents_of_mind/seller_commerce.clj`.
+- Working provider implementations: Yvatar's `routes/marketplace.clj`; the local LIAM test provider in `intergraph-compose/scripts/liam-commerce-stub.py` (a fixture, **not** a production fulfillment service).
+
+Runtime manifest and the deployed game/provider implementation decide which optional fields and lifecycle types are actually available. This page does not grant access to a game or publish its private adapter configuration.
