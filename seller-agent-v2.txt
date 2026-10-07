@@ -15,7 +15,7 @@ Companion note: https://www.commerceofagents.com/market-protocol-2.html
 
 This document describes the **seller-hosted HTTP adapter** used by a Market game such as Agents of Mind. It is distinct from the Game Master's `market/*` event API. The seller remains authoritative for its catalog, customer entitlements, and fulfillment; Market owns accepted orders, payment routing, attribution, and its ledger. “Market Protocol 2.0” is the name for the recent end-to-end work. The wire protocol here has the concrete `Seller-Commerce-Version: 2` and `contract_version: 2` identifiers.
 
-An independent software vendor (ISV) can sell a one-time software product and a recurring subscription through the same adapter. LIAM is an example of an ISV with both kinds of offering. The sample catalog and identifiers below illustrate the contract; a seller publishes its own actual products and prices.
+Yvatar is a production seller example: its v2 manifest advertises `one-time` billing for creation-credit purchases, and its service fulfills those purchases. The contract also supports an independent software vendor (ISV) selling one-time software products and recurring subscriptions. The sample catalog and identifiers below illustrate both billing paths; they are not Yvatar's actual catalog or a claim that Yvatar offers subscriptions.
 
 ## 1. Roles and trust boundary
 
@@ -238,6 +238,6 @@ For an ISV with one-time products and subscriptions, verify in Stripe **test mod
 
 - Market event and state model: `Intergraph-AI/the-js-game/docs/MARKET_PROTOCOL.md` and `gm-lib/src/game/protocols/market.clj`.
 - AoM's v2 HTTP client and event mapping: `Intergraph-AI/agents-of-mind/src/agents_of_mind/seller_commerce.clj`.
-- Working provider implementations: Yvatar's `routes/marketplace.clj`; a local LIAM test fixture in `intergraph-compose/scripts/liam-commerce-stub.py` (not a production fulfillment service).
+- Production seller example: Yvatar's `src/yvatar/routes/marketplace.clj` implements the one-time Seller Commerce v2 adapter and fulfillment path.
 
 Runtime manifest and the deployed game/provider implementation decide which optional fields and lifecycle types are actually available. This page does not grant access to a game or publish its private adapter configuration.
