@@ -15,6 +15,8 @@ Companion note: https://www.commerceofagents.com/market-protocol-2.html
 
 This document describes the **seller-hosted HTTP adapter** used by a Market game such as Agents of Mind. It is distinct from the Game Master's `market/*` event API. The seller remains authoritative for its catalog, customer entitlements, and fulfillment; Market owns accepted orders, payment routing, attribution, and its ledger. “Market Protocol 2.0” is the name for the recent end-to-end work. The wire protocol here has the concrete `Seller-Commerce-Version: 2` and `contract_version: 2` identifiers.
 
+An independent software vendor (ISV) can sell a one-time software product and a recurring subscription through the same adapter. LIAM is an example of an ISV with both kinds of offering. The sample catalog and identifiers below illustrate the contract; a seller publishes its own actual products and prices.
+
 ## 1. Roles and trust boundary
 
 1. An operator provisions a seller player/seat, private adapter base URL and service token, supported payment route, connected account if needed, and a private commission agreement. Do not publish service tokens or processor secrets in Market catalog state.
@@ -43,16 +45,16 @@ The current player-agent fulfillment relay can still use Seller Commerce v1 even
 
 `GET /seller-commerce/v2/manifest` must return the configured `adapter_id`, `contract_version: 2`, an environment (`test`, `preview`, or `production`), a checkout UI (`embedded` or `redirect`), nonempty supported `billing_modes` and `recipient_types`, `fulfillment_mode: "provider-outbox"`, and lifecycle types including `payment.confirmed`. Supported billing modes are `one-time`, `recurring`, and `free`; recipient types are `email`, `player`, and `none`. Advertise only features the seller actually implements. The game fails closed on an incompatible manifest.
 
-LIAM-style production manifest example (illustrative IDs; deploy only capabilities the real seller service supports):
+Example manifest for an ISV that implements both purchase types (illustrative IDs; advertise only deployed capabilities):
 
 ```json
 {
-  "adapter_id": "liam",
-  "display_name": "Liam",
+  "adapter_id": "example-isv",
+  "display_name": "Example software vendor",
   "contract_version": 2,
   "environment": "production",
   "checkout_ui": "embedded",
-  "billing_modes": ["recurring", "free"],
+  "billing_modes": ["one-time", "recurring"],
   "recipient_types": ["email"],
   "fulfillment_mode": "provider-outbox",
   "lifecycle_event_types": [
@@ -70,14 +72,25 @@ LIAM-style production manifest example (illustrative IDs; deploy only capabiliti
   "catalog_version": 3,
   "currency": "USD",
   "items": [{
-    "sku": "plus",
-    "title": "Liam Plus",
+    "sku": "credit-pack",
+    "title": "One-time credit pack",
+    "description": "A single purchase of 3,000 credits",
+    "kind": "product",
+    "price": {"amount": 3000, "currency": "USD"},
+    "billing": "one_time",
+    "checkout_enabled": true,
+    "entitlements": [{"type": "credits", "amount": 3000}],
+    "fulfillment": {"type": "account-entitlement", "recipient": {"type": "email"}},
+    "images": []
+  }, {
+    "sku": "monthly-plan",
+    "title": "Monthly software plan",
     "description": "5,000 creation credits each month",
     "kind": "subscription",
     "price": {"amount": 4900, "currency": "USD"},
     "price_ref": "price_example_plus",
     "billing": {"interval": "month", "interval_count": 1},
-    "subscription_group": "liam-credits",
+    "subscription_group": "software-credits",
     "checkout_enabled": true,
     "entitlements": [{"type": "credits", "amount": 5000, "period": "month"}],
     "fulfillment": {"type": "account-entitlement", "recipient": {"type": "email"}},
@@ -105,7 +118,7 @@ The current game request has snake_case top-level fields and a hyphenated `order
   "application_fee_bps": 3000,
   "orders": [{
     "order-id": "order_demo",
-    "sku": "plus",
+    "sku": "monthly-plan",
     "quantity": 1,
     "money": {"amount": 4900, "currency": "USD"}
   }]
@@ -115,10 +128,10 @@ The current game request has snake_case top-level fields and a hyphenated `order
 Success (`200`):
 
 ```json
-{"fulfillment_ref":"liam:checkout_demo","recipient":{"type":"email","value":"buyer@example.test"}}
+{"fulfillment_ref":"isv:checkout_demo","recipient":{"type":"email","value":"buyer@example.test"}}
 ```
 
-The example LIAM service handles one order per prepared checkout; a general seller service should either support the order array it advertises or reject unsupported combinations explicitly. `application_fee_bps` is the game's private, quoted commission input, not a reason to alter the buyer's catalog price.
+For a one-time purchase, prepare the `credit-pack` SKU with its accepted amount and quantity; no recurring plan is created. A seller service should support the order array it advertises or reject unsupported combinations explicitly. `application_fee_bps` is the game's private, quoted commission input, not a reason to alter the buyer's catalog price.
 
 ## 5. Lifecycle events and idempotency
 
@@ -137,7 +150,7 @@ Example payment confirmation (provider IDs are references, not Market identities
     "order_ids": ["order_demo"],
     "subscription_id": "subscription_checkout_demo",
     "buyer": "buyer_demo",
-    "fulfillment_ref": "liam:checkout_demo"
+    "fulfillment_ref": "isv:checkout_demo"
   },
   "payment": {
     "provider": "stripe",
@@ -152,7 +165,7 @@ Example payment confirmation (provider IDs are references, not Market identities
       "connected_account": "acct_example"
     }
   },
-  "payload": {"plan_sku": "plus"}
+  "payload": {"plan_sku": "monthly-plan"}
 }
 ```
 
@@ -167,10 +180,12 @@ Success (`200`) may include fulfillment events:
     "order_id": "order_demo",
     "type": "credits-granted",
     "occurred_at": "2026-10-06T12:00:01Z",
-    "data": {"sku": "plus", "credits": 5000}
+    "data": {"sku": "monthly-plan", "credits": 5000}
   }]
 }
 ```
+
+For a one-time product, `payment.confirmed` grants the purchased entitlement once. It does not start a subscription or expect renewal and plan-change events. The recurring example above includes subscription references because it represents the monthly plan.
 
 Handle only lifecycle types declared in the manifest. The current game may send:
 
@@ -202,7 +217,7 @@ Content-Type: application/json
 Return only unacknowledged events for those order IDs:
 
 ```json
-{"events":[{"id":"event_demo","order_id":"order_demo","type":"credits-granted","occurred_at":"2026-10-06T12:00:01Z","data":{"sku":"plus","credits":5000}}]}
+{"events":[{"id":"event_demo","order_id":"order_demo","type":"credits-granted","occurred_at":"2026-10-06T12:00:01Z","data":{"sku":"monthly-plan","credits":5000}}]}
 ```
 
 The agent rejects any unexpected order ID, submits `market/mark-fulfilled` for a matching order, and only after Market reports success calls `POST /seller-commerce/v2/fulfillment-events/event_demo/ack`. A successful ack returns `{"acknowledged":true}`. Keep the event available after an agent crash or failed Market call; a later query must find it again. The current Yvatar implementation accepts batches of 1–100 known order IDs. If the v1 relay is still deployed, its request key is `order-ids` (hyphenated), and the v1 paths remain required during migration.
@@ -217,12 +232,12 @@ Use an HTTP error status plus a machine-readable body such as:
 
 Use `401`/`403` for authentication or authorization failure, `409` for quote or idempotency conflict, `422` for invalid or unsupported input, and `5xx` only for a condition that may need safe retry. Do not mark an event processed before its entitlement and outbox writes commit. Do not return a new `fulfillment_ref` on a replay of `checkout_id`.
 
-For LIAM or another seller, verify in Stripe **test mode** each advertised billing path before production activation: initial payment/free activation, renewal, upgrade/downgrade, failed payment, refund, dispute, abandoned checkout, and webhook replay. Confirm matching Market order/subscription state, seller entitlements, fulfillment ack, processor IDs, and ledger/application-fee movement. Repeat deliveries must not duplicate charges, credits, or commission. Then configure the real seller account, signed webhooks, production fulfillment service, and checkout-enabled catalog. These are acceptance checks for a production integration, not a separate preview protocol.
+For an ISV with one-time products and subscriptions, verify in Stripe **test mode** both initial purchase paths, then renewal, upgrade/downgrade, failed payment, refund, dispute, abandoned checkout, and webhook replay as applicable. Also test free activation if the manifest advertises it. Confirm matching Market order/subscription state, seller entitlements, fulfillment ack, processor IDs, and ledger/application-fee movement. Repeat deliveries must not duplicate charges, credits, or commission. Then configure the real seller account, signed webhooks, production fulfillment service, and checkout-enabled catalog. These are acceptance checks for a production integration, not a separate preview protocol.
 
 ## 8. Implementation references
 
 - Market event and state model: `Intergraph-AI/the-js-game/docs/MARKET_PROTOCOL.md` and `gm-lib/src/game/protocols/market.clj`.
 - AoM's v2 HTTP client and event mapping: `Intergraph-AI/agents-of-mind/src/agents_of_mind/seller_commerce.clj`.
-- Working provider implementations: Yvatar's `routes/marketplace.clj`; the local LIAM test provider in `intergraph-compose/scripts/liam-commerce-stub.py` (a fixture, **not** a production fulfillment service).
+- Working provider implementations: Yvatar's `routes/marketplace.clj`; a local LIAM test fixture in `intergraph-compose/scripts/liam-commerce-stub.py` (not a production fulfillment service).
 
 Runtime manifest and the deployed game/provider implementation decide which optional fields and lifecycle types are actually available. This page does not grant access to a game or publish its private adapter configuration.

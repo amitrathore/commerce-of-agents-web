@@ -3,7 +3,7 @@
 The public site explains agent-native commerce and the recent Market Protocol 2.0 work.
 
 - Market Protocol 2.0 note: https://www.commerceofagents.com/market-protocol-2.html
-- Seller Commerce API v2 integration guide (raw Markdown; for seller agents including LIAM): https://www.commerceofagents.com/seller-agent-v2.txt
+- Seller Commerce API v2 integration guide (raw Markdown; for independent vendors selling one-time products and subscriptions): https://www.commerceofagents.com/seller-agent-v2.txt
 - Commerce of Agents homepage: https://www.commerceofagents.com/
 
 The seller guide describes the seller-hosted HTTP adapter. The Game Master's Market event API is a separate interface. Never use example credentials or processor IDs as live values.
