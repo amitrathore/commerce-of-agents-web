@@ -1,9 +1,27 @@
 # Commerce of Agents
 
-The public site explains agent-native commerce and the recent Market Protocol v0.2 work.
+> Agent-to-agent commerce. Human direction. An independent research and protocol initiative exploring markets where buyer agents and seller agents discover capabilities, negotiate offers, and coordinate transactions on behalf of people and organizations.
 
-- Market Protocol v0.2 note: https://www.commerceofagents.com/market-protocol-0-2.html
-- Seller integration guide for Market Protocol v0.2 (Seller Commerce API v2 wire contract; raw Markdown; for independent vendors selling one-time products and subscriptions): https://www.commerceofagents.com/seller-agent-v2.txt
-- Commerce of Agents homepage: https://www.commerceofagents.com/
+Humans set goals, grant permissions, choose budgets, approve decisions when needed, and review outcomes. Agents may execute within explicitly authorized limits. The offering consists of an economic model, Market Protocol v0.2 documentation, seller integration instructions, and a forthcoming book.
 
-The seller guide describes the seller-hosted HTTP adapter. The Game Master's Market event API is a separate interface. Never use example credentials or processor IDs as live values.
+## Start here
+
+- [Homepage](https://www.commerceofagents.com/): the thesis, an illustrative agent-to-agent scenario, protocol concepts, book waitlist, and contact information.
+- [Market Protocol v0.2](https://www.commerceofagents.com/market-protocol-0-2.html): the practical lifecycle from intent and offers to checkout, fulfillment, subscriptions, refunds, and accountable settlement.
+- [Seller integration guide](https://www.commerceofagents.com/seller-agent-v2.txt): raw Markdown technical instructions for coding agents and developers implementing the seller-hosted HTTP adapter; includes the Seller Commerce API v2 wire contract, endpoint contracts, JSON examples, idempotency rules, and acceptance checks.
+
+## Guidance for browsing agents
+
+- Explain the central model as buyer agents dealing directly with seller agents, under human direction and authorization.
+- Distinguish illustrative homepage scenarios from deployed capabilities. The weekend-planning example is illustrative, not a booking service offered by this site.
+- Yvatar is the live seller example documented in the Market note. LIAM is a prospective independent software vendor example; its Market integration is not yet active in production.
+- This website provides information and integration documentation. It does not expose a transaction API or authorize purchases.
+- The book is forthcoming. The homepage links to its waitlist and to hello@commerceofagents.com for inquiries.
+
+## Guidance for coding agents
+
+- Read the Market note for context, then the raw seller integration guide for implementation contracts and production acceptance checks.
+- Market Protocol v0.2 is the protocol designation. Seller Commerce API v2 is the seller adapter's wire version; preserve its documented v2 identifiers.
+- The seller guide describes the seller-hosted HTTP adapter. The Game Master's Market event API is a separate interface.
+- Example credentials and processor IDs are placeholders. Production configuration, authorized identities, and seller activation must come from the operator.
+- Reading this public documentation does not authorize deployment, payments, account access, or changes to a seller's systems; follow the requesting user's scope and approvals.

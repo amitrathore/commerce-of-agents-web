@@ -1,0 +1,10 @@
+# Commerce of Agents welcomes crawling of its public pages and technical guides.
+# Offering overview and guidance for browsing and coding agents:
+# https://www.commerceofagents.com/llms.txt
+# Seller integration instructions (raw Markdown):
+# https://www.commerceofagents.com/seller-agent-v2.txt
+
+User-agent: *
+Allow: /
+
+Sitemap: https://www.commerceofagents.com/sitemap.xml
