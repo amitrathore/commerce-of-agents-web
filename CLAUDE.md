@@ -27,10 +27,13 @@ The main pages and shared styles are:
 - **`seller-agent-v2.txt`** — Raw Markdown seller integration guide for Market Protocol v0.2; its Seller Commerce API v2 wire identifiers remain in use, linked from `llms.txt`.
 - **`styles.css`** — All styling. Uses CSS custom properties for theming, CSS Grid for layouts, and a `clamp()`-based fluid type scale. Mobile breakpoint is at `880px`.
 
-There is no JavaScript.
+There is no application JavaScript. The Tally embed script resizes the waitlist iframe.
 
 ## Key Customization Points
 
-- **Contact email**: `index.html` line 192 — replace `hello@example.com`
-- **Color theme**: CSS variables at the top of `styles.css` (background `#f7f4ee`, accent `#b36b2c`)
-- **Domain**: `CNAME` file contains `www.commerceofagents.com`
+- Contact email: `hello@commerceofagents.com` in the homepage and article footer.
+- Color theme: custom properties at the top of `styles.css`; warm off-white, ink, electric lime, and violet.
+- Artwork: `agent-orbits.webp` for the hero; `og.png` is the 1200 × 630 social card, with `og-art.png` as its source.
+- Brand mark: `favicon.svg`, shared with the header and footer.
+- Waitlist: direct Tally iframe plus the resize script and a fallback signup link.
+- Domain: `CNAME` contains `www.commerceofagents.com`.
