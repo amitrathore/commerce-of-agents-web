@@ -496,6 +496,9 @@ h3 {
 }
 
 @media (max-width: 540px) {
+  .site-header { align-items: flex-start; flex-direction: column; gap: 16px; }
+  .nav { justify-content: flex-start; }
+
   .grid,
   .feature-list {
     grid-template-columns: 1fr;
