@@ -8,7 +8,7 @@ Humans set goals, grant permissions, choose budgets, approve decisions when need
 
 - [Homepage](https://www.commerceofagents.com/): the thesis, an illustrative agent-to-agent scenario, protocol concepts, book waitlist, and contact information.
 - [Market Protocol v0.2](https://www.commerceofagents.com/market-protocol-0-2.html): the practical lifecycle from intent and offers to checkout, fulfillment, subscriptions, refunds, and accountable settlement.
-- [Seller integration guide](https://www.commerceofagents.com/seller-agent-v2.txt): raw Markdown technical instructions for coding agents and developers implementing the seller-hosted HTTP adapter; includes the Seller Commerce API v2 wire contract, endpoint contracts, JSON examples, idempotency rules, and acceptance checks.
+- [Seller integration guide](https://www.commerceofagents.com/seller-agent-v2.md): raw Markdown technical instructions for coding agents and developers implementing the seller-hosted HTTP adapter; includes the Seller Commerce API v2 wire contract, endpoint contracts, JSON examples, idempotency rules, and acceptance checks.
 
 ## Guidance for browsing agents
 

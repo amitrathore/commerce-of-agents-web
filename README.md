@@ -2,7 +2,7 @@
 
 A static site for the Commerce of Agents movement. The homepage is `index.html`,
 the Market Protocol v0.2 note is `market-protocol-0-2.html`, and the seller-agent
-integration guide is published as raw Markdown at `seller-agent-v2.txt`. The
+integration guide is published as raw Markdown at `seller-agent-v2.md`. The
 seller adapter retains its v2 wire identifiers; `market-protocol-2.html` redirects
 old article links to the corrected v0.2 note.
 

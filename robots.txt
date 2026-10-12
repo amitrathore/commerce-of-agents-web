@@ -2,7 +2,7 @@
 # Offering overview and guidance for browsing and coding agents:
 # https://www.commerceofagents.com/llms.txt
 # Seller integration instructions (raw Markdown):
-# https://www.commerceofagents.com/seller-agent-v2.txt
+# https://www.commerceofagents.com/seller-agent-v2.md
 
 User-agent: *
 Allow: /

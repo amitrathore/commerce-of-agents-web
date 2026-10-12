@@ -24,7 +24,7 @@ The main pages and shared styles are:
 
 - **`index.html`** — All markup. Single-page layout with anchor-based navigation (`#thesis`, `#protocol`, `#book`, `#contact`).
 - **`market-protocol-0-2.html`** — Long-form Market Protocol v0.2 note. The former `market-protocol-2.html` path redirects here.
-- **`seller-agent-v2.txt`** — Raw Markdown seller integration guide for Market Protocol v0.2; its Seller Commerce API v2 wire identifiers remain in use, linked from `llms.txt`.
+- **`seller-agent-v2.md`** — Raw Markdown seller integration guide for Market Protocol v0.2; its Seller Commerce API v2 wire identifiers remain in use, linked from `llms.txt`.
 - **`styles.css`** — All styling. Uses CSS custom properties for theming, CSS Grid for layouts, and a `clamp()`-based fluid type scale. Mobile breakpoint is at `880px`.
 
 There is no application JavaScript. The Tally embed script resizes the waitlist iframe.

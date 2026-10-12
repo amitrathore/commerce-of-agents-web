@@ -12,7 +12,7 @@ status: production integration guide; enable each seller after its own acceptanc
 
 *Wire contract: Seller Commerce API v2*
 
-Canonical URL: https://www.commerceofagents.com/seller-agent-v2.txt
+Canonical URL: https://www.commerceofagents.com/seller-agent-v2.md
 Companion note: https://www.commerceofagents.com/market-protocol-0-2.html
 
 This document describes the **seller-hosted HTTP adapter** used by a Market game such as Agents of Mind. It is distinct from the Game Master's `market/*` event API. The seller remains authoritative for its catalog, customer entitlements, and fulfillment; Market owns accepted orders, payment routing, attribution, and its ledger. Market Protocol v0.2 names the Game Master commerce protocol. The seller-hosted adapter has its own v2 wire contract, with the concrete `Seller-Commerce-Version: 2` and `contract_version: 2` identifiers.
