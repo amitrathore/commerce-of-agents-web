@@ -9,8 +9,7 @@ old article links to the corrected v0.2 note.
 ## Deploy on GitHub Pages
 
 GitHub Pages publishes the root of `master` at
-`https://www.commerceofagents.com/`. The `.txt` guide contains Markdown and is
-served as plain text for agents and developer tools. The checked-in `.nojekyll`
+`https://www.commerceofagents.com/`. The `.md` guide is served as raw Markdown for agents and developer tools. The checked-in `.nojekyll`
 file keeps GitHub Pages from processing the static files. A push to `master`
 publishes the site.
 
